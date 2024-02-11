@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+
+{% block title %}
+Homepage
+{% endblock %}
+
+{% block body %}
+
+
+
+<div class="container">
+  <input type="radio" name="slider" id="item-1" checked>
+  <input type="radio" name="slider" id="item-2">
+  <input type="radio" name="slider" id="item-3">
+  <div class="cards">
+    <label class="card" for="item-1" id="song-1">
+      <img src="static/albert.jpg" alt="albert">
+    </label>
+    <label class="card" for="item-2" id="song-2">
+      <img src="static/steve.png" alt="steve">
+    </label>
+    <label class="card" for="item-3" id="song-3">
+      <img src="static/mar.jpg" alt="marilyn">
+    </label>
+  </div>
+</div>
+
+
+
+
+<br>
+
+  <div class="box">
+    <div class="object">
+       <div class="outline">
+       </div>
+       <div class="outline" id="delayed">
+       </div>
+       <div class="button">
+       </div>
+       <div class="button" id="circlein">
+         <svg class="mic-icon" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 1000 1000" enable-background="new 0 0 1000 1000" xml:space="preserve" style="fill:#1E2D70">
+ <g><path d="M500,683.8c84.6,0,153.1-68.6,153.1-153.1V163.1C653.1,78.6,584.6,10,500,10c-84.6,0-153.1,68.6-153.1,153.1v367.5C346.9,615.2,415.4,683.8,500,683.8z M714.4,438.8v91.9C714.4,649,618.4,745,500,745c-118.4,0-214.4-96-214.4-214.4v-91.9h-61.3v91.9c0,141.9,107.2,258.7,245,273.9v124.2H346.9V990h306.3v-61.3H530.6V804.5c137.8-15.2,245-132.1,245-273.9v-91.9H714.4z"/></g>
+ </svg>
+       </div>
+    </div>
+ </div>
+
+ <script>
+  const labels = document.querySelectorAll('.card');
+  labels.forEach(label => {
+      label.addEventListener('click', () => {
+          const frontImageAlt = label.querySelector('img').alt;
+          console.log('The image in front is:', frontImageAlt);
+          // Send the character name to the backend
+          fetch('/set_character', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ character: frontImageAlt })
+          })
+          .then(response => {
+              if (response.ok) {
+                  console.log('Character name sent to the backend.');
+              } else {
+                  console.error('Error sending character name to the backend.');
+              }
+          })
+          .catch(error => {
+              console.error('Error:', error);
+          });
+      });
+  });
+
+
+  const micIcon = document.querySelector('.mic-icon');
+  let isListening = false; // Variable to track listening state
+
+  micIcon.addEventListener('click', () => {
+    if (!isListening) {
+      micIcon.style.fill = 'red'; // Change mic color to red
+
+      // Send AJAX request to start listening
+      fetch('/start_listening', {
+        method: 'POST',
+      })
+      .then(response => {
+        if (response.ok) {
+          isListening = true; // Set listening state to true
+          console.log('Listening started...');
+        } else {
+          console.error('Error starting listening...');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    } else {
+      micIcon.style.fill = '#1E2D70'; // Change mic color back to default
+
+      // Send AJAX request to stop listening
+      fetch('/stop_listening', {
+        method: 'POST',
+      })
+      .then(response => {
+        if (response.ok) {
+          isListening = false; // Set listening state to false
+          console.log('Listening stopped...');
+        } else {
+          console.error('Error stopping listening...');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    }
+  });
+</script>
+
+
+{% endblock %}
